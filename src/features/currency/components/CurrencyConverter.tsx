@@ -15,9 +15,11 @@ export const CurrencyConverter = () => {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors },
   } = useForm<ConversionFormData>({
     resolver: zodResolver(conversionSchema),
+    mode: 'onChange',
     defaultValues: {
       amount: 1,
       from: 'USD',
@@ -32,15 +34,13 @@ export const CurrencyConverter = () => {
 
   const debouncedAmount = useDebounce(amount, 500)
 
+  const canConvert = fromCurrency && toCurrency && debouncedAmount && debouncedAmount > 0 && !errors.root
+
   const {
     data: conversion,
     isLoading: isLoadingConversion,
     error: conversionError,
-  } = useCurrencyConversion(
-    fromCurrency && toCurrency && debouncedAmount && debouncedAmount > 0
-      ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount }
-      : null
-  )
+  } = useCurrencyConversion(canConvert ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount } : null)
 
   // Form submission is handled automatically by React Query hook
   // The hook will automatically refetch when form values change via watch()
@@ -68,7 +68,10 @@ export const CurrencyConverter = () => {
           value={fromCurrency}
           currencies={currencies || []}
           error={errors.from?.message}
-          onChange={value => setValue('from', value)}
+          onChange={value => {
+            setValue('from', value)
+            trigger() // Re-validate entire form when 'from' changes
+          }}
         />
 
         <CurrencySelect
@@ -77,14 +80,17 @@ export const CurrencyConverter = () => {
           value={toCurrency}
           currencies={currencies || []}
           error={errors.to?.message}
-          onChange={value => setValue('to', value)}
+          onChange={value => {
+            setValue('to', value)
+            trigger() // Re-validate entire form when 'to' changes
+          }}
         />
       </div>
 
+      {errors.root && <ErrorMessage message={errors.root.message} />}
+
       {conversionError && (
-        <ErrorMessage
-          message={conversionError instanceof Error ? conversionError.message : 'Failed to convert currency'}
-        />
+        <ErrorMessage message={conversionError instanceof Error ? conversionError.message : undefined} />
       )}
 
       {conversion && <ConversionResult result={conversion} toCurrency={toCurrency} fromCurrency={fromCurrency} />}
