@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -34,6 +36,8 @@
     "tailwindcss": "4.1.13",
     "@tailwindcss/postcss": "4.1.13",
     "postcss": "8.4.49",
-    "autoprefixer": "10.4.20"
+    "autoprefixer": "10.4.20",
+    "prettier": "3.6.2",
+    "eslint-config-prettier": "10.1.8"
   }
 }
