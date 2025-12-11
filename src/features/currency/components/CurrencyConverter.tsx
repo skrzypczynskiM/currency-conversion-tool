@@ -37,7 +37,7 @@ export const CurrencyConverter = () => {
     isLoading: isLoadingConversion,
     error: conversionError,
   } = useCurrencyConversion(
-    fromCurrency && toCurrency && debouncedAmount
+    fromCurrency && toCurrency && debouncedAmount && debouncedAmount > 0
       ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount }
       : null
   )

@@ -18,6 +18,7 @@ export const AmountInput = forwardRef<HTMLInputElement, AmountInputProps>(({ id,
         type="number"
         step="0.01"
         min="0.01"
+        placeholder="0.00"
         className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 bg-white text-gray-900 placeholder:text-gray-400"
         {...props}
       />

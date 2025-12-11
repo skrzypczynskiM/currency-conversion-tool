@@ -31,4 +31,3 @@ export const CurrencySelect = ({ id, label, value, currencies, error, onChange }
     </div>
   )
 }
-
