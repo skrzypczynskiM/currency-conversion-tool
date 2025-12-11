@@ -7,6 +7,7 @@ import { conversionSchema, type ConversionFormData } from '../schemas'
 import { AmountInput } from '../../../components/ui/AmountInput'
 import { ErrorMessage } from '../../../components/ui/ErrorMessage'
 import { LoadingState } from '../../../components/ui/LoadingState'
+import { useDebounce } from '../../../hooks/useDebounce'
 
 export const CurrencyConverter = () => {
   const {
@@ -29,12 +30,16 @@ export const CurrencyConverter = () => {
   const toCurrency = watch('to')
   const amount = watch('amount')
 
+  const debouncedAmount = useDebounce(amount, 500)
+
   const {
     data: conversion,
     isLoading: isLoadingConversion,
     error: conversionError,
   } = useCurrencyConversion(
-    fromCurrency && toCurrency && amount ? { from: fromCurrency, to: toCurrency, amount } : null
+    fromCurrency && toCurrency && debouncedAmount
+      ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount }
+      : null
   )
 
   // Form submission is handled automatically by React Query hook
@@ -88,4 +93,3 @@ export const CurrencyConverter = () => {
     </form>
   )
 }
-
