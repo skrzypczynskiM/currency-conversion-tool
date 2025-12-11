@@ -1,5 +1,5 @@
 import { currencyBeaconApi } from './api/currencyBeacon'
-import type { Currency, ConversionParams, ConversionResult } from '../types/domain/currency'
+import type { Currency, ConversionParams, ConversionResult } from '../features/currency/types'
 import type { CurrencyApiResponse } from '../types/api/currency'
 
 export const currencyService = {

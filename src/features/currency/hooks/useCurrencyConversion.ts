@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
-import { currencyService } from '../services/currencyService'
-import type { ConversionParams } from '../types/domain/currency'
+import { currencyService } from '../../../services/currencyService'
+import type { ConversionParams } from '../types'
 
 export const currencyQueryKeys = {
   currencies: ['currencies'] as const,
@@ -30,3 +30,4 @@ export const useCurrencyConversion = (params: ConversionParams | null) => {
     gcTime: 5 * 60 * 1000, // 5 minutes
   })
 }
+

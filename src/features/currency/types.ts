@@ -1,7 +1,6 @@
 export type Currency = {
   code: string
   name: string
-  countries?: string[]
 }
 
 export type ConversionParams = {
