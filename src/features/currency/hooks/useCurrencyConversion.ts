@@ -13,6 +13,7 @@ export const useCurrencies = () => {
     queryFn: () => currencyService.getCurrencies(),
     staleTime: 10 * 60 * 1000, // 10 minutes - currencies don't change often
     gcTime: 30 * 60 * 1000, // 30 minutes
+    select: data => data ?? [],
   })
 }
 
@@ -30,4 +31,3 @@ export const useCurrencyConversion = (params: ConversionParams | null) => {
     gcTime: 5 * 60 * 1000, // 5 minutes
   })
 }
-

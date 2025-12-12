@@ -4,8 +4,10 @@ import { useCurrencies, useCurrencyConversion } from '../hooks/useCurrencyConver
 import { CurrencySelect } from './CurrencySelect'
 import { ConversionResult } from './ConversionResult'
 import { conversionSchema, type ConversionFormData } from '../schemas'
+import { canConvert } from '../utils/conversionHelpers'
 import { AmountInput, ErrorMessage, LoadingState } from '../../../components/ui'
 import { useDebounce } from '../../../hooks/useDebounce'
+import { getErrorMessage } from '../../../utils/errorHelpers'
 
 export const CurrencyConverter = () => {
   const {
@@ -24,21 +26,20 @@ export const CurrencyConverter = () => {
     },
   })
 
-  const { data: currencies, isLoading: isLoadingCurrencies } = useCurrencies()
-  const fromCurrency = watch('from')
-  const toCurrency = watch('to')
-  const amount = watch('amount')
+  const { data: currencies = [], isLoading: isLoadingCurrencies } = useCurrencies()
+  const [fromCurrency, toCurrency, amount] = watch(['from', 'to', 'amount'])
 
   const debouncedAmount = useDebounce(amount, 300)
 
-  const canConvert =
-    fromCurrency && toCurrency && fromCurrency !== toCurrency && debouncedAmount && debouncedAmount > 0 && !errors.root
+  const isValidForConversion = canConvert({ from: fromCurrency, to: toCurrency }, debouncedAmount, !!errors.root)
 
   const {
     data: conversion,
     isLoading: isLoadingConversion,
     error: conversionError,
-  } = useCurrencyConversion(canConvert ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount } : null)
+  } = useCurrencyConversion(
+    isValidForConversion && debouncedAmount ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount } : null
+  )
 
   const handleCurrencyChange = (field: 'from' | 'to', value: string) => {
     setValue(field, value)
@@ -47,6 +48,10 @@ export const CurrencyConverter = () => {
 
   if (isLoadingCurrencies) {
     return <LoadingState message="Loading currencies..." size="lg" />
+  }
+
+  if (currencies.length === 0) {
+    return <ErrorMessage message="No currencies available. Please try refreshing the page or check your connection." />
   }
 
   return (
@@ -68,7 +73,7 @@ export const CurrencyConverter = () => {
             id="from"
             label="From"
             value={fromCurrency}
-            currencies={currencies || []}
+            currencies={currencies}
             error={errors.from?.message}
             onChange={value => handleCurrencyChange('from', value)}
           />
@@ -79,7 +84,7 @@ export const CurrencyConverter = () => {
             id="to"
             label="To"
             value={toCurrency}
-            currencies={currencies || []}
+            currencies={currencies}
             error={errors.to?.message}
             onChange={value => handleCurrencyChange('to', value)}
           />
@@ -88,9 +93,7 @@ export const CurrencyConverter = () => {
 
       {errors.root && <ErrorMessage message={errors.root.message} />}
 
-      {conversionError && (
-        <ErrorMessage message={conversionError instanceof Error ? conversionError.message : undefined} />
-      )}
+      {conversionError && <ErrorMessage message={getErrorMessage(conversionError)} />}
 
       {conversion && <ConversionResult result={conversion} toCurrency={toCurrency} fromCurrency={fromCurrency} />}
 
