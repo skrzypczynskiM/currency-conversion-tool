@@ -4,9 +4,7 @@ import { useCurrencies, useCurrencyConversion } from '../hooks/useCurrencyConver
 import { CurrencySelect } from './CurrencySelect'
 import { ConversionResult } from './ConversionResult'
 import { conversionSchema, type ConversionFormData } from '../schemas'
-import { AmountInput } from '../../../components/ui/AmountInput'
-import { ErrorMessage } from '../../../components/ui/ErrorMessage'
-import { LoadingState } from '../../../components/ui/LoadingState'
+import { AmountInput, ErrorMessage, LoadingState } from '../../../components/ui'
 import { useDebounce } from '../../../hooks/useDebounce'
 
 export const CurrencyConverter = () => {
@@ -32,7 +30,7 @@ export const CurrencyConverter = () => {
   const toCurrency = watch('to')
   const amount = watch('amount')
 
-  const debouncedAmount = useDebounce(amount, 500)
+  const debouncedAmount = useDebounce(amount, 300)
 
   const canConvert = fromCurrency && toCurrency && debouncedAmount && debouncedAmount > 0 && !errors.root
 
@@ -54,37 +52,45 @@ export const CurrencyConverter = () => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
-        <AmountInput
-          id="amount"
-          label="Amount"
-          {...register('amount', { valueAsNumber: true })}
-          error={errors.amount?.message}
-        />
+      <div className="flex flex-col md:flex-row gap-4 md:gap-6">
+        <div className="flex-1 min-w-0">
+          <AmountInput
+            id="amount"
+            label="Amount"
+            {...register('amount', {
+              valueAsNumber: true,
+            })}
+            error={errors.amount?.message}
+          />
+        </div>
 
-        <CurrencySelect
-          id="from"
-          label="From"
-          value={fromCurrency}
-          currencies={currencies || []}
-          error={errors.from?.message}
-          onChange={value => {
-            setValue('from', value)
-            trigger() // Re-validate entire form when 'from' changes
-          }}
-        />
+        <div className="flex-1 min-w-0">
+          <CurrencySelect
+            id="from"
+            label="From"
+            value={fromCurrency}
+            currencies={currencies || []}
+            error={errors.from?.message}
+            onChange={value => {
+              setValue('from', value)
+              trigger()
+            }}
+          />
+        </div>
 
-        <CurrencySelect
-          id="to"
-          label="To"
-          value={toCurrency}
-          currencies={currencies || []}
-          error={errors.to?.message}
-          onChange={value => {
-            setValue('to', value)
-            trigger() // Re-validate entire form when 'to' changes
-          }}
-        />
+        <div className="flex-1 min-w-0">
+          <CurrencySelect
+            id="to"
+            label="To"
+            value={toCurrency}
+            currencies={currencies || []}
+            error={errors.to?.message}
+            onChange={value => {
+              setValue('to', value)
+              trigger()
+            }}
+          />
+        </div>
       </div>
 
       {errors.root && <ErrorMessage message={errors.root.message} />}

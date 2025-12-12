@@ -18,7 +18,6 @@ apiClient.interceptors.request.use(
   }
 )
 
-// Response interceptor - handle errors
 apiClient.interceptors.response.use(
   response => response,
   (error: AxiosError) => {

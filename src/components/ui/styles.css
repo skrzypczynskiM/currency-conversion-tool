@@ -1,0 +1,13 @@
+@layer components {
+  .input-label {
+    @apply block text-sm font-medium text-gray-600 mb-4;
+  }
+
+  .input-field {
+    @apply w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-150 bg-white text-gray-900 cursor-pointer;
+  }
+
+  .input-error {
+    @apply mt-2 text-sm text-red-600 font-medium;
+  }
+}
