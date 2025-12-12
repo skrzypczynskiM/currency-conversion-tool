@@ -10,7 +10,6 @@ import { useDebounce } from '../../../hooks/useDebounce'
 export const CurrencyConverter = () => {
   const {
     register,
-    handleSubmit,
     watch,
     setValue,
     trigger,
@@ -32,7 +31,8 @@ export const CurrencyConverter = () => {
 
   const debouncedAmount = useDebounce(amount, 300)
 
-  const canConvert = fromCurrency && toCurrency && debouncedAmount && debouncedAmount > 0 && !errors.root
+  const canConvert =
+    fromCurrency && toCurrency && fromCurrency !== toCurrency && debouncedAmount && debouncedAmount > 0 && !errors.root
 
   const {
     data: conversion,
@@ -40,10 +40,9 @@ export const CurrencyConverter = () => {
     error: conversionError,
   } = useCurrencyConversion(canConvert ? { from: fromCurrency, to: toCurrency, amount: debouncedAmount } : null)
 
-  // Form submission is handled automatically by React Query hook
-  // The hook will automatically refetch when form values change via watch()
-  const onSubmit = () => {
-    // No-op: conversion happens automatically via useCurrencyConversion hook
+  const handleCurrencyChange = (field: 'from' | 'to', value: string) => {
+    setValue(field, value)
+    trigger()
   }
 
   if (isLoadingCurrencies) {
@@ -51,7 +50,7 @@ export const CurrencyConverter = () => {
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
+    <form className="space-y-6 sm:space-y-8">
       <div className="flex flex-col md:flex-row gap-4 md:gap-6">
         <div className="flex-1 min-w-0">
           <AmountInput
@@ -71,10 +70,7 @@ export const CurrencyConverter = () => {
             value={fromCurrency}
             currencies={currencies || []}
             error={errors.from?.message}
-            onChange={value => {
-              setValue('from', value)
-              trigger()
-            }}
+            onChange={value => handleCurrencyChange('from', value)}
           />
         </div>
 
@@ -85,10 +81,7 @@ export const CurrencyConverter = () => {
             value={toCurrency}
             currencies={currencies || []}
             error={errors.to?.message}
-            onChange={value => {
-              setValue('to', value)
-              trigger()
-            }}
+            onChange={value => handleCurrencyChange('to', value)}
           />
         </div>
       </div>
@@ -101,7 +94,7 @@ export const CurrencyConverter = () => {
 
       {conversion && <ConversionResult result={conversion} toCurrency={toCurrency} fromCurrency={fromCurrency} />}
 
-      {isLoadingConversion && <LoadingState message="Converting..." size="md" />}
+      {isLoadingConversion && !conversion && <LoadingState message="Converting..." size="md" />}
     </form>
   )
 }

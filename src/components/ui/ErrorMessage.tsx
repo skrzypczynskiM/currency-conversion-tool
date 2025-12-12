@@ -3,7 +3,7 @@ type ErrorMessageProps = {
 }
 
 export const ErrorMessage = ({ message }: ErrorMessageProps) => {
-  const displayMessage = message || 'Wystąpił błąd'
+  const displayMessage = message || 'An error occurred'
 
   return (
     <div className="p-4 bg-red-50 border-2 border-red-200 rounded-xl shadow-sm">
