@@ -8,8 +8,7 @@ A modern, responsive currency conversion application built with React, TypeScrip
 - 🌍 Support for all major fiat currencies
 - ⚡ Fast and responsive UI with debounced input
 - ✅ Form validation with clear error messages
-- 📱 Fully responsive design
-- 🎨 Modern, clean interface
+- 🛡️ Error boundary for graceful error handling
 
 ## Prerequisites
 
@@ -88,13 +87,14 @@ pnpm preview
 ```
 src/
 ├── components/
-│   └── ui/              # Reusable UI components (AmountInput, ErrorMessage, LoadingState)
+│   └── ui/              # Reusable UI components (AmountInput, ErrorMessage, LoadingState, ErrorBoundary)
 ├── config/
 │   └── env.ts           # Environment variable validation
 ├── features/
 │   └── currency/        # Currency conversion feature
 │       ├── components/   # Feature-specific components
 │       ├── hooks/        # Custom React hooks for data fetching
+│       ├── utils/        # Feature-specific utility functions
 │       ├── schemas.ts    # Zod validation schemas
 │       └── types.ts      # Feature-specific TypeScript types
 ├── hooks/
@@ -102,9 +102,11 @@ src/
 ├── services/
 │   ├── api/             # API client and endpoint functions
 │   └── currencyService.ts # Business logic layer
-└── types/
-    ├── api/             # API response types
-    └── common.ts        # Shared types
+├── types/
+│   ├── api/             # API response types
+│   └── common.ts        # Shared types
+└── utils/
+    └── errorHelpers.ts  # Error handling utilities
 ```
 
 ## Technology Stack
@@ -125,6 +127,7 @@ src/
 - **Feature-based structure**: Code is organized by features (e.g., `currency/`) rather than by file type, making it easier to scale and maintain.
 - **Separation of concerns**: Clear separation between API layer (`services/api/`), business logic (`services/currencyService.ts`), and UI components.
 - **Type safety**: Full TypeScript coverage with separate types for API responses and domain models.
+- **Code organization**: Business logic extracted to helper functions (`conversionHelpers`, `errorHelpers`) for better maintainability and testability.
 
 ### API Integration
 
@@ -145,12 +148,20 @@ src/
 - **Minimum amount**: Minimum conversion amount is set to 0.01 to prevent invalid conversions.
 - **Loading states**: Clear loading indicators for both currency list loading and conversion operations.
 - **Error messages**: Contextual error messages with visual indicators (icons and color coding).
+- **Empty state handling**: Application displays a helpful message when no currencies are available, guiding users to refresh or check their connection.
 
 ### Component Design
 
-- **Reusable components**: Shared UI components (`AmountInput`, `CurrencySelect`, `ErrorMessage`, `LoadingState`) are in `components/ui/`.
+- **Reusable components**: Shared UI components (`AmountInput`, `CurrencySelect`, `ErrorMessage`, `LoadingState`, `ErrorBoundary`) are in `components/ui/`.
 - **Barrel exports**: Simplified imports using index files (`index.ts`).
 - **Styling**: Centralized component styles using Tailwind CSS `@apply` directive in `styles.css`.
+- **Helper functions**: Business logic extracted to utility functions (`conversionHelpers`, `errorHelpers`) for better testability and reusability.
+
+### Error Handling
+
+- **Error Boundary**: Application is wrapped in an Error Boundary component that catches JavaScript errors and displays a user-friendly error message instead of crashing the entire application.
+- **Type-safe error handling**: Error handling utilities (`errorHelpers.ts`) provide type guards and safe error message extraction.
+- **Edge case handling**: Application handles edge cases like empty currency lists gracefully with appropriate error messages.
 
 ## Assumptions
 
@@ -164,17 +175,15 @@ The following assumptions were made during development:
    - Users will input positive numeric values only (negative values and non-numeric characters are blocked at the UI level).
    - Users understand that they need to select different currencies for conversion (validation prevents same currency selection).
 
-4. **Browser Support**: The application assumes modern browser support for ES6+ features, React 19, and CSS Grid/Flexbox.
+4. **Environment Variables**: The application assumes that the API key is provided via environment variables and will fail fast with a clear error message if missing.
 
-5. **Environment Variables**: The application assumes that the API key is provided via environment variables and will fail fast with a clear error message if missing.
+5. **Network Conditions**: The application assumes reasonable network conditions. A 10-second timeout is set for API requests.
 
-6. **Network Conditions**: The application assumes reasonable network conditions. A 10-second timeout is set for API requests.
+6. **Data Freshness**: Exchange rates are considered fresh for 1 minute, after which they are refetched. This balances between real-time accuracy and API rate limits.
 
-7. **Data Freshness**: Exchange rates are considered fresh for 1 minute, after which they are refetched. This balances between real-time accuracy and API rate limits.
+7. **Currency List Stability**: The list of available currencies is considered stable and cached for 10 minutes, as currencies rarely change.
 
-8. **Currency List Stability**: The list of available currencies is considered stable and cached for 10 minutes, as currencies rarely change.
-
-9. **Form Behavior**: The form uses automatic conversion (no submit button) - conversions happen automatically when valid input is provided, similar to modern currency converter tools.
+8. **Form Behavior**: The form uses automatic conversion (no submit button) - conversions happen automatically when valid input is provided, similar to modern currency converter tools.
 
 ## Available Scripts
 
@@ -194,6 +203,15 @@ https://currencybeacon.com/api-documentation
 
 - `GET /v1/currencies` - Fetch list of available currencies
 - `GET /v1/convert` - Convert amount between currencies
+
+## Future Improvements
+
+The following improvements were identified but not implemented due to time constraints:
+
+- **Testing**: Unit tests for components, hooks, and services using React Testing Library
+- **TypeScript path aliases**: Use `@/` imports instead of relative paths
+- **Refresh functionality**: Add a manual refresh button to update exchange rates on demand (API provides `timestamp` and `date` fields that could be utilized)
+- **Last updated indicator**: Display when the exchange rate was last updated using the `timestamp` field from the API response
 
 ## License
 
