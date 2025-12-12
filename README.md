@@ -2,6 +2,8 @@
 
 A modern, responsive currency conversion application built with React, TypeScript, and Vite. This tool allows users to convert between different currencies using real-time exchange rates from the CurrencyBeacon API.
 
+![Currency Conversion Tool Screenshot](./docs/images/screenshot.png)
+
 ## Features
 
 - 💱 Real-time currency conversion
